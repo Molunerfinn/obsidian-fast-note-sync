@@ -2,6 +2,7 @@
 
 # 触发条件配置
 on:
+  workflow_dispatch: # 支持手动触发
   push:
     # 针对 master 分支的普通提交也触发
     branches:
@@ -77,10 +78,11 @@ jobs:
                fi
             fi
           else
-            # 如果是 tag 触发 (手动打 tag 推送)
-            echo "Triggered by tag ${{ github.ref }}. Proceeding with release."
+            # workflow_dispatch 或其他触发
+            echo "Triggered by ${{ github.ref }}. Proceeding with release."
+            CURRENT_VERSION=$(jq -r .version manifest.json)
             echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "release_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "release_tag=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           fi
       - name: Prepare Commit Message
         id: prepare
